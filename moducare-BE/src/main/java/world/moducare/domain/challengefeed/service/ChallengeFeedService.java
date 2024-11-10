@@ -1,5 +1,6 @@
 package world.moducare.domain.challengefeed.service;
 
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import world.moducare.domain.challenge.entity.Challenge;
@@ -79,7 +80,11 @@ public class ChallengeFeedService {
 
     // YYYY-MM-DD 오전/오후 HH:MM:SS 형식으로 변환
     public static String formatToCustomString(ZonedDateTime zonedDateTime) {
+        // ZonedDateTime을 한국 시간대로 변환
+        ZonedDateTime seoulTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss", Locale.KOREAN);
-        return zonedDateTime.format(formatter);
+        return seoulTime.format(formatter);
     }
+
 }

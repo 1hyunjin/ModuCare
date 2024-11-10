@@ -1,9 +1,11 @@
 package world.moducare.domain.diary.service;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import world.moducare.domain.diary.dto.DiaryRequestDto;
@@ -37,7 +39,7 @@ public class DiaryService {
         for (HeadDiary headDiary : list) {
             DiaryResponseDto diaryResponseDto = DiaryResponseDto.builder()
                     .img(headDiary.getImage())
-                    .regDate(formatZonedDateTime(headDiary.getCreatedAt()))
+                    .regDate(formatToCustomString(headDiary.getCreatedAt()))
                     .build();
 
             diaryResponseDtoList.add(diaryResponseDto);
@@ -45,9 +47,12 @@ public class DiaryService {
         return diaryResponseDtoList;
     }
 
-    // YYYY-MM-DD 형식으로 변환
-    public static String formatZonedDateTime(ZonedDateTime zonedDateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return zonedDateTime.format(formatter);
+    // YYYY-MM-DD 오전/오후 HH:MM:SS 형식으로 변환
+    public static String formatToCustomString(ZonedDateTime zonedDateTime) {
+        // ZonedDateTime을 한국 시간대로 변환
+        ZonedDateTime seoulTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss", Locale.KOREAN);
+        return seoulTime.format(formatter);
     }
 }

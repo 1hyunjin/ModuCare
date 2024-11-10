@@ -1,5 +1,6 @@
 package world.moducare.domain.diagnosis.service;
 
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import world.moducare.domain.api.gpt.GptService;
@@ -66,12 +67,6 @@ public class DiagnosticResultService {
                 .build();
     }
 
-    // YYYY-MM-DD 오전/오후 HH:MM:SS 형식으로 변환
-    public static String formatToCustomString(ZonedDateTime zonedDateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss", Locale.KOREAN);
-        return zonedDateTime.format(formatter);
-    }
-
     public DiagnosisRequestDto diagnoseByAI(Member member, AiResultDto aiResultDto, String url) {
         int average = diagnosticResultRepository.findLatestAverageByMember(member).orElse(-1);
         int comparison;
@@ -119,7 +114,16 @@ public class DiagnosticResultService {
                 .headType(aiResultDto.getHeadType())
                 .comparison(comparison)
                 .manageComment(advice)
-                .date(String.valueOf(diagnosticResult.getCreatedAt()))
+                .date(formatToCustomString(diagnosticResult.getCreatedAt()))
                 .build();
+    }
+
+    // YYYY-MM-DD 오전/오후 HH:MM:SS 형식으로 변환
+    public static String formatToCustomString(ZonedDateTime zonedDateTime) {
+        // ZonedDateTime을 한국 시간대로 변환
+        ZonedDateTime seoulTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss", Locale.KOREAN);
+        return seoulTime.format(formatter);
     }
 }
