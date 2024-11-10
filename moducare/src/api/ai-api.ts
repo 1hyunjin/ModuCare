@@ -4,19 +4,25 @@ import axiosInstance from './../util/axios';
 type ResponseAiDiagnosis = {
   img: string;
   result: number[];
+  headType: number;
   comparison: number;
   manageComment: string;
   date: string;
 };
 
 const postAiDiagnosis = async (
-  imgSrc: string,
+  file: FormData,
 ): Promise<ResponseAiDiagnosis> => {
-  const {data} = await axiosInstance.post(`diagnosis`, {
-    imgSrc,
-  });
+  try {
+    const {data} = await axiosInstance.post(`diagnosis`, file, {
+      headers: {'Content-Type': 'multipart/form-data'},
+    });
 
-  return data;
+    return data;
+  } catch (error) {
+    console.log('ai진단 에러', error);
+    throw error;
+  }
 };
 
 type ResponsePick = {
@@ -27,12 +33,17 @@ type ResponsePick = {
   productType: string[];
 };
 
-const getPick = async (headType: number): Promise<ResponsePick> => {
-  const {data} = await axiosInstance.get(`elasticSearch/recommend`, {
-    headType,
-  });
+const getPick = async (headType: number): Promise<ResponsePick[]> => {
+  try {
+    const {data} = await axiosInstance.get(`elasticSearch/recommend`, {
+      headType,
+    });
 
-  return data;
+    return data;
+  } catch (error) {
+    console.log('추천 에러', error);
+    throw error;
+  }
 };
 
 export {postAiDiagnosis, getPick};

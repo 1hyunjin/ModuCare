@@ -9,9 +9,46 @@ import notifee, {AuthorizationStatus} from '@notifee/react-native';
 import {setEncryptStorage} from './util';
 import SplashScreen from 'react-native-splash-screen';
 import {setupInterceptors} from './util/headers';
+import ChallengeMainPage from './Pages/Challenge/ChallengeMainPage';
+import MainPage from './Pages/MainPage';
+import {Linking} from 'react-native';
+import StackNavigate from './navigate/StackNavigate';
+import {Screen} from 'react-native-screens';
+
+const DEEPLINK_PREFIX_URL = ['moducare://'];
+
+const deepLinksConfig = {
+  // screens: {
+  //   MainPage: 'main',
+  //   ChallengeMainPage: {
+  //     Screen : {
+  //       bo
+  //     }
+  //   },
+  //   ai: 'ai',
+  // },
+  screens: {
+    MainPage: 'main',
+    bottomNavigate: {
+      screens: {
+        챌린지: '챌린지',
+      },
+    },
+    ai: 'ai',
+  },
+};
+
+const linking = {
+  prefixes: DEEPLINK_PREFIX_URL,
+  config: deepLinksConfig,
+  async getInitialURL() {
+    const url = await Linking.getInitialURL();
+    if (url != null) return url;
+  },
+};
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
-  // console.log('[Background Remote Message]', remoteMessage);
+  console.log('[Background Remote Message]', remoteMessage);
   pushNoti.dispayNoti(remoteMessage);
 });
 
@@ -40,13 +77,15 @@ export default function App() {
       // console.log('[Remote Message] ', JSON.stringify(remoteMessage));
       pushNoti.dispayNoti(remoteMessage);
     });
+
     return unsubscribe;
   }, []);
 
   return (
     <QueryClientProvider client={queryClinet}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <RootNavigate />
+        {/* <StackNavigate /> */}
       </NavigationContainer>
     </QueryClientProvider>
   );

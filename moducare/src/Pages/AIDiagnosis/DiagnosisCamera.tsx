@@ -7,6 +7,7 @@ import usePermission from '../../hook/usePermission';
 import {useNavigation} from '@react-navigation/native';
 import {Camera, useCameraDevice} from 'react-native-vision-camera';
 import CustomButtom from '../../Components/Common/CustomButton';
+import {postAiDiagnosis} from '../../api/ai-api';
 
 const DiagnosisCamera = () => {
   const navigation = useNavigation();
@@ -29,6 +30,17 @@ const DiagnosisCamera = () => {
         console.error('사진 촬영 실패:', error);
       }
     }
+  };
+
+  const handleAiDiagnosis = async () => {
+    //검사진행
+    const formData = new FormData();
+    formData.append('file', {
+      uri: imageUri, // 사진 URI
+      type: 'image/jpeg', // 이미지 파일 타입 (예시로 jpeg 사용)
+      name: 'photo.jpg', // 파일명
+    });
+    await postAiDiagnosis(formData);
   };
 
   // 이미지 삭제 함수

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -13,6 +13,7 @@ import CustomButtom from '../../Components/Common/CustomButton';
 import CustomText from '../../Components/Common/CustomText';
 import SvgIconAtom from '../../Components/Common/SvgIconAtom';
 import {BarChart} from 'react-native-gifted-charts';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 const DiagnosisResult = ({navigation}) => {
   const careText: string = `첫째, 두피를 깨끗하게 유지하려면 적어도 주 2-3회 샴푸로 세척해줘야 해요. 둘째, 너무 뜨거운 물보다는 미지근한 물을 사용하는 게 좋아요. 셋째, 각질 제거를  위해 주 1회 스크럽이나 두피 마스크를 사용해보세요.\n
@@ -38,6 +39,43 @@ const DiagnosisResult = ({navigation}) => {
     {value: 10, label: '피지', labelTextStyle: labelTextStyle},
     {value: 30, label: '각질', labelTextStyle: labelTextStyle},
   ];
+
+  // pdf
+  const [pdfPath, setPdfPath] = useState('');
+  const htmlContent = `
+  <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #4CAF50; }
+        p { font-size: 16px; }
+      </style>
+    </head>
+    <body>
+      <h1>PDF 생성 예시</h1>
+      <p>이것은 간단한 HTML 템플릿을 사용하여 생성된 PDF입니다.</p>
+    </body>
+  </html>
+`;
+  const generatePDF = async () => {
+    try {
+      const options = {
+        html: htmlContent,
+        fileName: 'testpdf', // PDF 파일 이름
+        directory: 'docs', // 파일이 저장될 디렉토리 (기본값은 documents)
+      };
+
+      // PDF 생성
+      const file = await RNHTMLtoPDF.convert(options);
+
+      // 생성된 PDF 파일 경로 출력
+      console.log('PDF 파일 경로:', file.filePath);
+      setPdfPath(file.filePath);
+    } catch (error) {
+      console.error('PDF 생성 오류:', error);
+    }
+  };
+  //
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -108,7 +146,7 @@ const DiagnosisResult = ({navigation}) => {
             label="나에게 맞는 샴푸 확인하기"
             onPress={() => navigation.navigate('aiPick')}
           />
-          <CustomButtom label="두피 검진 문서 생성" />
+          <CustomButtom label="두피 검진 문서 생성" onPress={generatePDF} />
           <CustomButtom
             label="메인으로"
             onPress={() => navigation.navigate('bottomNavigate')}
