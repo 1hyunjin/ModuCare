@@ -26,8 +26,10 @@ public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
     private final OAuth2UserCustomService oAuth2UserCustomService;
-    public static final Duration ACCESS_TOKEN_DURATION = Duration.ofHours(2);
-    public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
+//    public static final Duration ACCESS_TOKEN_DURATION = Duration.ofHours(2);
+//    public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
+    public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(14);
+    public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(21);
 
     @PostMapping("/login/{registerId}")
     @Operation(summary = "소셜 로그인", description = "프론트엔드로부터 소셜 액세스 토큰을 받아 사용자 인증을 처리합니다.")
