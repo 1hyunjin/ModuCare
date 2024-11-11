@@ -8,13 +8,10 @@ interface LatestProduct {
 
 const getLastestProduct = async (): Promise<LatestProduct> => {
   try {
-    const response = await axiosInstance.get(
-      `${Config.API_URL}products/latest`,
-    );
-    console.log('최근 상품 호출 성공 ', response.data);
+    const response = await axiosInstance.get(`product/latest`);
+    console.log('최근 상품 호출 성공 ', response);
     return response.data;
   } catch (error) {
-    console.log('최근 상품 호출 실패');
     console.log(error);
     throw error;
   }
@@ -25,13 +22,10 @@ const postLastestProduct = async (
   link: string,
 ): Promise<LatestProduct> => {
   try {
-    const response = await axiosInstance.post(
-      `${Config.API_URL}products/latest`,
-      {
-        imgSrc,
-        link,
-      },
-    );
+    const response = await axiosInstance.post(`product/latest`, {
+      imgSrc,
+      link,
+    });
     console.log('최근 상품 저장 성공 ', response.data);
     return response.data;
   } catch (error) {

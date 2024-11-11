@@ -6,43 +6,44 @@ import {colors} from '../constants/colors';
 import NaverLogin, {NaverLoginResponse} from '@react-native-seoul/naver-login';
 import useAuthStore from '../store/useAuthStore';
 import {getEncryptStorage} from '../util';
-import useLogin from '../hook/useAuth';
 import {getProfile} from '@react-native-seoul/kakao-login';
-import {getKeyHashAndroid, initializeKakaoSDK} from '@react-native-kakao/core';
+import {initializeKakaoSDK} from '@react-native-kakao/core';
 import {login} from '@react-native-kakao/user';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import Config from 'react-native-config';
+import useAuth from '../hook/useAuth';
 
 initializeKakaoSDK('585639d392d8089816cb2f337aea44d9');
 
-const LoginPage = ({navigation}) => {
-  const loginMutation = useLogin();
-
+const LoginPage = ({navigation}: {navigation: any}) => {
+  const {setIsLoggedIn} = useAuthStore(
+    state => state as {setIsLoggedIn: (value: boolean) => void},
+  );
+  const {loginMutation} = useAuth();
   const [userInfo, setUserInfo] = useState(null);
   const handleKakaoLogin = () => {
-    console.log('ee');
     login().then(console.log).catch(console.log);
   };
 
-  const {setNaverLoginSuccess, setNaverLoginFailure, setIsLoggedIn} =
-    useAuthStore(
-      state =>
-        state as {
-          setNaverLoginSuccess: (
-            value: NaverLoginResponse['successResponse'],
-          ) => void;
-          setNaverLoginFailure: (
-            value: NaverLoginResponse['failureResponse'],
-          ) => void;
-          setIsLoggedIn: (value: boolean) => void;
-        },
-    );
-
+  const {setNaverLoginSuccess, setNaverLoginFailure} = useAuthStore(
+    state =>
+      state as {
+        setNaverLoginSuccess: (
+          value: NaverLoginResponse['successResponse'],
+        ) => void;
+        setNaverLoginFailure: (
+          value: NaverLoginResponse['failureResponse'],
+        ) => void;
+      },
+  );
   const onNaverLogin = async () => {
     const {failureResponse, successResponse} = await NaverLogin.login();
     setNaverLoginSuccess(successResponse);
     setNaverLoginFailure(failureResponse);
     if (successResponse) {
       const fcmToken = await getEncryptStorage('fcmToken');
-      loginMutation.loginMutation.mutate({
+      loginMutation.mutate({
         fcmToken,
         accessToken: successResponse.accessToken,
         registerId: 'naver',
@@ -53,7 +54,32 @@ const LoginPage = ({navigation}) => {
       console.log('네이버 로그인 실패', failureResponse);
     }
   };
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log('Config.Google_CLIENT_ID : ', Config.Google_CLIENT_ID);
+    const googleSigninConfigure = () => {
+      GoogleSignin.configure({
+        webClientId: Config.Google_CLIENT_ID as string,
+      });
+    };
+    googleSigninConfigure();
+  }, []);
+
+  const onGoogleLogin = async () => {
+    await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true})
+      .then(res => console.log('hasPlayServices', res))
+      .catch(err => console.log('hasPlayServices', err));
+    try {
+      const userInfo = await GoogleSignin.signIn();
+      console.log('userInfo : ', userInfo.data);
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        userInfo.data.idToken,
+      );
+      const res = await auth().signInWithCredential(googleCredential);
+      console.log('res : ', res);
+    } catch (error: any) {
+      console.log('Message', error.message);
+    }
+  };
 
   const getUserInfo = async accessToken => {
     const user = await getProfile();
@@ -85,6 +111,13 @@ const LoginPage = ({navigation}) => {
               onPress={onNaverLogin}>
               <SvgIconAtom name="Naver" />
               <Text style={styles.naverText}>네이버 로그인 테스트</Text>
+              <View />
+            </Pressable>
+            <Pressable
+              style={[styles.btn, styles.google]}
+              onPress={onGoogleLogin}>
+              <SvgIconAtom name="Google" />
+              <Text style={styles.naverText}>구글 로그인</Text>
               <View />
             </Pressable>
           </View>
@@ -139,6 +172,9 @@ const styles = StyleSheet.create({
   },
   naver: {
     backgroundColor: '#03C75A',
+  },
+  google: {
+    backgroundColor: '#4285F4',
   },
   ImgArea: {
     position: 'relative',

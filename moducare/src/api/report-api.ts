@@ -3,7 +3,7 @@ import Config from 'react-native-config';
 
 const getLineDiaryData = async () => {
   try {
-    const response = await axiosInstance.get(`${Config.API_URL}diaries/line`);
+    const response = await axiosInstance.get(`diaries/line`);
     console.log('이마 리포트 호출 성공 ', response.data);
     const mappedData = response.data.map((item: any) => ({
       ...item,
@@ -21,7 +21,7 @@ const getTopDiaryData = async () => {
   // const data = await axiosInstance.get('/diaries/top');
   // return data;
   try {
-    const response = await axiosInstance.get(`${Config.API_URL}diaries/top`);
+    const response = await axiosInstance.get(`diaries/top`);
     console.log('정수리 리포트 호출 성공 ', response.data);
     const mappedData = response.data.map((item: any) => ({
       ...item,
@@ -39,7 +39,7 @@ const getReportData = async () => {
   // const data = await axiosInstance.get('/diagnosis');
   // return data;
   try {
-    const response = await axiosInstance.get(`${Config.API_URL}diagnosis`);
+    const response = await axiosInstance.get(`diagnosis`);
     console.log('리포트 호출 성공 ', response.data);
     return response.data;
   } catch (error) {

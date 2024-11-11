@@ -12,7 +12,20 @@
           "package_name": "com.moducare"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "608668018853-ou03k23gtibh01voatvg2aj45pf6apam.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.moducare",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "608668018853-k90kcfmelo3flo4luucu2r3r4qb1eeu3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZeFTYTTCoEKd8mBiL_h9Upd0JXwdmnHc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608668018853-4akjv33ql8edkfmt5a6caruojmei4rcq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

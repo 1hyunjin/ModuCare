@@ -12,14 +12,22 @@ import {useEffect} from 'react';
 import queryClinet from '../util/queryClient';
 import NaverLogin from '@react-native-seoul/naver-login';
 import Config from 'react-native-config';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import useAuthStore from '../store/useAuthStore';
 
 const useLogin = (mutationOptions?: UseMutationCustomOptions) => {
+  const {setIsLoggedIn} = useAuthStore(
+    state => state as {setIsLoggedIn: (value: boolean) => void},
+  );
   useEffect(() => {
     // 네이버 로그인 초기화
     NaverLogin.initialize({
       appName: 'moducare',
       consumerKey: Config.NAVER_CLIENT_ID as string,
       consumerSecret: Config.NAVER_CLIENT_SECRET as string,
+    });
+    GoogleSignin.configure({
+      webClientId: Config.Google_CLIENT_ID as string,
     });
   }, []);
 
@@ -32,9 +40,13 @@ const useLogin = (mutationOptions?: UseMutationCustomOptions) => {
       setEncryptStorage('refreshToken', refreshToken);
       setEncryptStorage('info', {name, birth, email});
       setHeader('Authorization', `Bearer ${jwtAccessToken}`);
+      setIsLoggedIn(true);
     },
     onSettled: () => {
       queryClinet.refetchQueries({queryKey: ['auth', 'getAccessToken']});
+    },
+    onError: () => {
+      setIsLoggedIn(false);
     },
     ...mutationOptions,
   });
@@ -54,7 +66,7 @@ const useGetRefreshToken = () => {
     if (isSuccess) {
       setHeader('Authorization', `Bearer ${data.accessToken}`);
     }
-  }, [isSuccess]);
+  }, [isSuccess, data?.accessToken]);
 
   useEffect(() => {
     if (isError) {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import RootNavigate from './navigate/RootNavigate';
 import {QueryClientProvider} from '@tanstack/react-query';
 import queryClinet from './util/queryClient';
@@ -71,8 +71,6 @@ export default function App() {
   React.useEffect(() => {
     requestNotificationPermission();
     getFcmToken();
-    // 앱 시작 시 토큰 소지 여부를 인터셉터로 확인
-    setupInterceptors();
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       // console.log('[Remote Message] ', JSON.stringify(remoteMessage));
       pushNoti.dispayNoti(remoteMessage);

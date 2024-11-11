@@ -5,7 +5,6 @@ import queryClient from '../util/queryClient';
 export const QueryKey = 'product';
 
 export const useLatestProductQuery = () => {
-  console.log('최근 상품 조회 중');
   return useQuery({
     queryFn: getLastestProduct,
     queryKey: [QueryKey],

@@ -23,3 +23,4 @@ export {default as Unchecked} from './CheckBox_unchecked.svg';
 export {default as Main_temparature} from './Main_temparature.svg';
 export {default as Main_air} from './Main_air.svg';
 export {default as Main_UV} from './Main_UV.svg';
+export {default as Google} from './google.svg';
