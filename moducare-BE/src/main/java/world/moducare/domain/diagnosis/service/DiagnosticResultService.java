@@ -8,7 +8,6 @@ import world.moducare.domain.api.gpt.PromptService;
 import world.moducare.domain.diagnosis.dto.AiResultDto;
 import world.moducare.domain.diagnosis.dto.DiagnosisRequestDto;
 import world.moducare.domain.diagnosis.dto.DiagnosisResponseDto;
-import world.moducare.domain.diagnosis.dto.DiagnosticResultDto;
 import world.moducare.domain.diagnosis.entity.DiagnosticResult;
 import world.moducare.domain.diagnosis.repository.DiagnosticResultRepository;
 import world.moducare.domain.member.entity.Member;
@@ -48,7 +47,7 @@ public class DiagnosticResultService {
         return diagnosisResponseDtoList;
     }
 
-    public DiagnosticResultDto getDiagnosis(Long diagnosisId, Member member) {
+    public DiagnosisRequestDto getDiagnosis(Long diagnosisId, Member member) {
         DiagnosticResult diagnosticResult = diagnosticResultRepository.findByMemberAndId(member, diagnosisId).orElseThrow(()->new RestApiException(ErrorCode.NOT_FOUND));
         int[] result = new int[6];
         result[0] = diagnosticResult.getHairLoss();
@@ -58,11 +57,12 @@ public class DiagnosticResultService {
         result[4] = diagnosticResult.getSebum();
         result[5] = diagnosticResult.getDeadSkin();
 
-        return DiagnosticResultDto.builder()
-                .image(diagnosticResult.getImage())
-                .manageComment(diagnosticResult.getAdvice())
+        return DiagnosisRequestDto.builder()
+                .img(diagnosticResult.getImage())
                 .result(result)
+                .headType(AiResultDto.headTypeToInt(diagnosticResult.getResult()))
                 .comparison(diagnosticResult.getComparison())
+                .manageComment(diagnosticResult.getAdvice())
                 .date(formatToCustomString(diagnosticResult.getCreatedAt()))
                 .build();
     }

@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import world.moducare.domain.diagnosis.dto.AiResultDto;
 import world.moducare.domain.diagnosis.dto.DiagnosisRequestDto;
 import world.moducare.domain.diagnosis.dto.DiagnosisResponseDto;
-import world.moducare.domain.diagnosis.dto.DiagnosticResultDto;
 import world.moducare.domain.diagnosis.service.DiagnosticResultService;
 import world.moducare.domain.member.entity.Member;
 import world.moducare.domain.member.service.MemberService;
@@ -47,11 +46,11 @@ public class DiagnosticResultController {
 
     @GetMapping("/{diagnosisId}")
     @Operation(summary = "진단 내역 상세 조회", description = "사용자의 진단 목록 중 하나를 상세 조회")
-    public ResponseEntity<DiagnosticResultDto> getDiagnosticResult(@PathVariable Long diagnosisId, @AuthenticationPrincipal CustomOAuth2User principal) {
+    public ResponseEntity<DiagnosisRequestDto> getDiagnosticResult(@PathVariable Long diagnosisId, @AuthenticationPrincipal CustomOAuth2User principal) {
         // 특정 진단 결과 상세 조회 로직 작성
         Member member = memberService.findById(principal.getId());
-        DiagnosticResultDto result = diagnosticResultService.getDiagnosis(diagnosisId,member);
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        DiagnosisRequestDto diagnosisRequestDto = diagnosticResultService.getDiagnosis(diagnosisId,member);
+        return ResponseEntity.status(HttpStatus.OK).body(diagnosisRequestDto);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

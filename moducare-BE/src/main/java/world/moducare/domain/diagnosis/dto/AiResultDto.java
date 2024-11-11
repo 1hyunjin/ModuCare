@@ -58,4 +58,27 @@ public class AiResultDto {
                 return "알 수 없음"; // 혹시 모를 예외 상황을 위한 기본값
         }
     }
+
+    public static int headTypeToInt(String headType) {
+        switch (headType) {
+            case "양호":
+                return 0;
+            case "건성":
+                return 1;
+            case "지성":
+                return 2;
+            case "민감성":
+                return 3;
+            case "지루성":
+                return 4;
+            case "염증성":
+                return 5;
+            case "비듬성":
+                return 6;
+            case "탈모성":
+                return 7;
+            default:
+                return -1; // 혹시 모를 예외 상황을 위한 기본값
+        }
+    }
 }
