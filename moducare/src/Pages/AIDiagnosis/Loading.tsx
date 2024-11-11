@@ -6,11 +6,6 @@ import SvgIconAtom from '../../Components/Common/SvgIconAtom';
 import CustomText from '../../Components/Common/CustomText';
 
 const Loading = ({navigation}) => {
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     navigation.navigate('aiResult');
-  //   }, 1000);
-  // }, []);
   return (
     <SafeAreaView style={styles.container}>
       <SvgIconAtom name="AiLoading" />

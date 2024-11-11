@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {colors} from '../../constants/colors';
@@ -12,11 +12,22 @@ import {
   postOutChallenge,
 } from '../../api/challenge-api';
 import CustomText from '../../Components/Common/CustomText';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {getEncryptStorage} from '../../util';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigate/StackNavigate';
 
-const ChallengeFeedPage = ({route}) => {
-  const navigation = useNavigation();
+const ChallengeFeedPage = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, 'challenge_feed'>;
+}) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {id, title, type} = route.params;
   const [isType, setIsType] = useState(type);
   const [feeds, setFeeds] = useState<FeedType[] | []>([]);

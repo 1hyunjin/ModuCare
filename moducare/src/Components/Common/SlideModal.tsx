@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 15,
-    minHeight: HEIGHT * 0.3,
+    minHeight: HEIGHT * 0.33,
   },
   modalHeadLine: {
     width: 100,
@@ -53,5 +53,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.MAIN,
     borderRadius: 10,
     alignSelf: 'center',
+    marginBottom: 10,
   },
 });

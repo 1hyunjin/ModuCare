@@ -11,12 +11,16 @@ import CustomText from '../../Components/Common/CustomText';
 import ItemBox from '../../Components/ItemBox/ItemBox';
 import {useReportQuery, ReportItem} from '../../quires/useReportsQuery';
 import {Dimensions} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {getEncryptStorage} from '../../util';
+import {RootStackParamList} from '../../navigate/StackNavigate';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const HEIGHT = Dimensions.get('window').height;
 
 export default function ReportPage() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {data: reportData, isLoading: reportLoading} = useReportQuery();
   const reportList = reportData;
   const [user, setUser] = useState('사용자');
@@ -48,7 +52,7 @@ export default function ReportPage() {
             <CustomText label="로딩중입니다..." />
           </View>
         )}
-        {!reportList && (
+        {!reportList?.length && (
           <View style={styles.reportListEmpty}>
             <CustomText label="리포트가 아직 작성되지 않았습니다." />
           </View>
@@ -57,7 +61,11 @@ export default function ReportPage() {
           reportList.map((report: ReportItem) => (
             <TouchableOpacity
               onPress={() => {
-                // navigation.navigate('reportDetail', {id: report.idx});
+                navigation.navigate('aiResult', {
+                  type: 'report',
+                  id: report.idx,
+                  diagnosisResult: null,
+                });
               }}>
               <ItemBox style={styles.reportCard}>
                 <View style={styles.reportCardItem}>

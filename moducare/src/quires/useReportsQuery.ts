@@ -61,35 +61,32 @@ export const useReportQuery = () => {
   return useQuery({
     queryKey: [QueryKey.report],
     queryFn: getReportData,
-    select: response =>
-      response.data.map((item: ReportItem) => ({
-        idx: item.idx,
-        date: item.date,
-        diagnosis: item.diagnosis,
-      })),
   });
 };
 
-export const useReportDetailQuery = (id: number) => {
+export const useReportDetailQuery = (
+  id: number,
+  options?: {enabled?: boolean},
+) => {
   return useQuery({
-    queryKey: [QueryKey.reportDetail, {id}],
     queryFn: () => getReportDetailData(id),
+    queryKey: [QueryKey.reportDetail, {id}],
+    ...options,
   });
 };
-
 export const usePostHairImgMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
-      uploadedUrl,
+      formData,
       imgType,
     }: {
-      uploadedUrl: string;
+      formData: FormData;
       imgType: 'line' | 'top';
-    }) => postHairImg(uploadedUrl, imgType),
+    }) => postHairImg(formData, imgType),
     onSuccess: (_, {imgType}) => {
       // 이미지 타입에 따른 useQuery 업데이트
-      queryClient.invalidateQueries({queryKey: [QueryKey[`${imgType}`]]});
+      queryClient.invalidateQueries({queryKey: [QueryKey[imgType]]});
     },
     onError: error => {
       console.log(error);

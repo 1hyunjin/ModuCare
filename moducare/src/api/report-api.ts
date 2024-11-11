@@ -3,7 +3,7 @@ import Config from 'react-native-config';
 
 const getLineDiaryData = async () => {
   try {
-    const response = await axiosInstance.get(`diaries/line`);
+    const response = await axiosInstance.get('diaries/line');
     console.log('이마 리포트 호출 성공 ', response.data);
     const mappedData = response.data.map((item: any) => ({
       ...item,
@@ -21,7 +21,7 @@ const getTopDiaryData = async () => {
   // const data = await axiosInstance.get('/diaries/top');
   // return data;
   try {
-    const response = await axiosInstance.get(`diaries/top`);
+    const response = await axiosInstance.get('diaries/top');
     console.log('정수리 리포트 호출 성공 ', response.data);
     const mappedData = response.data.map((item: any) => ({
       ...item,
@@ -39,7 +39,7 @@ const getReportData = async () => {
   // const data = await axiosInstance.get('/diagnosis');
   // return data;
   try {
-    const response = await axiosInstance.get(`diagnosis`);
+    const response = await axiosInstance.get('diagnosis');
     console.log('리포트 호출 성공 ', response.data);
     return response.data;
   } catch (error) {
@@ -49,16 +49,26 @@ const getReportData = async () => {
 };
 
 const getReportDetailData = async (id: number) => {
-  const data = await axiosInstance.get(`/diagnosis/${id}`);
-  return data;
+  try {
+    const response = await axiosInstance.get(`/diagnosis/${id}`);
+    console.log('리포트 상세 호출 성공 ', response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
-const postHairImg = async (imgUrl: string, imgType: string) => {
-  console.log('시작 !!!', imgUrl, imgType);
+const postHairImg = async (formData: FormData, imgType: string | undefined) => {
+  console.log('시작 !!!', formData, imgType);
   try {
-    const data = await axiosInstance.post(`${Config.API_URL}diaries`, {
-      img: imgUrl,
-      type: imgType,
+    const data = await axiosInstance.post('diaries', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      params: {
+        type: imgType,
+      },
     });
 
     console.log('사진 업로드 성공 ', data);

@@ -82,9 +82,9 @@ export default MyCarousel;
 const styles = StyleSheet.create({
   card: {
     width: WIDTH * 0.6,
-    height: HEIGHT * 0.35,
+    height: HEIGHT * 0.4,
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#E0E0E0',
     backgroundColor: 'white',
     alignItems: 'center',
@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
   },
   diaryCard: {
     width: WIDTH * 0.6,
-    height: HEIGHT * 0.35,
+    height: HEIGHT * 0.4,
+    marginBottom: 20,
   },
   dairyImg: {
     width: '100%',
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '80%',
+    marginBottom: 10,
   },
   titleContainer: {
     marginTop: 5,

@@ -23,6 +23,28 @@ import DiagnosisIOT from '../Pages/AIDiagnosis/DiagnosisIOT';
 type RootStackParamList = {
   StressResultPage: {stressScore: number};
   bottomNavigate: undefined;
+  main: undefined;
+  ai: undefined;
+  challenge_feed: {
+    id: number;
+    title: string;
+    type: string;
+  };
+  challenge_write: {
+    id: number;
+  };
+  aiResult: {
+    type: 'report' | 'diagnosis';
+    id: number | null;
+    diagnosisResult: {
+      img: string;
+      result: number[];
+      headType: number;
+      comparison: number;
+      manageComment: string;
+      date: string;
+    } | null;
+  };
 };
 
 const PrevIcon = () => (
@@ -88,7 +110,14 @@ const StackNavigate = () => {
           headerBackImage: () => <PrevIcon />,
         }}
       />
-      <Stack.Screen name="challenge" component={ChallengeMainPage} />
+      <Stack.Screen
+        name="challenge"
+        component={ChallengeMainPage}
+        options={{
+          title: '',
+          headerBackImage: () => <PrevIcon />,
+        }}
+      />
       <Stack.Screen
         name="challenge_list"
         component={ChallengeListPage}

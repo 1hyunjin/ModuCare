@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import RootNavigate from './navigate/RootNavigate';
 import {QueryClientProvider} from '@tanstack/react-query';
 import queryClinet from './util/queryClient';
@@ -7,26 +7,11 @@ import messaging from '@react-native-firebase/messaging';
 import pushNoti from './util/pushNoti';
 import notifee, {AuthorizationStatus} from '@notifee/react-native';
 import {setEncryptStorage} from './util';
-import SplashScreen from 'react-native-splash-screen';
-import {setupInterceptors} from './util/headers';
-import ChallengeMainPage from './Pages/Challenge/ChallengeMainPage';
-import MainPage from './Pages/MainPage';
 import {Linking} from 'react-native';
-import StackNavigate from './navigate/StackNavigate';
-import {Screen} from 'react-native-screens';
 
 const DEEPLINK_PREFIX_URL = ['moducare://'];
 
 const deepLinksConfig = {
-  // screens: {
-  //   MainPage: 'main',
-  //   ChallengeMainPage: {
-  //     Screen : {
-  //       bo
-  //     }
-  //   },
-  //   ai: 'ai',
-  // },
   screens: {
     MainPage: 'main',
     bottomNavigate: {
@@ -43,7 +28,9 @@ const linking = {
   config: deepLinksConfig,
   async getInitialURL() {
     const url = await Linking.getInitialURL();
-    if (url != null) return url;
+    if (url != null) {
+      return url;
+    }
   },
 };
 
@@ -60,7 +47,9 @@ export default function App() {
     // 권한 상태는 settings.authorizationStatus로 확인할 수 있다
     if (settings.authorizationStatus >= AuthorizationStatus.DENIED) {
       return true;
-    } else return false;
+    } else {
+      return false;
+    }
   };
   const getFcmToken = async () => {
     const fcmToken = await messaging().getToken();
@@ -83,7 +72,6 @@ export default function App() {
     <QueryClientProvider client={queryClinet}>
       <NavigationContainer linking={linking}>
         <RootNavigate />
-        {/* <StackNavigate /> */}
       </NavigationContainer>
     </QueryClientProvider>
   );

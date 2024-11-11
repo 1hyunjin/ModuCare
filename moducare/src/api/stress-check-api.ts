@@ -25,13 +25,14 @@ const postResult = async (stressScore: number): Promise<void> => {
 };
 
 const getResult = async (): Promise<ResultData[]> => {
-  // axiosInstance로 변경 필요
   try {
     const {data} = await axiosInstance.get(`${Config.API_URL}stress/recent`);
 
     return data.map((item: ResultData) => ({
       ...item,
-      label: item.label.slice(5, 10), // "2024-11-06T04:03:32.806283Z" -> "11-06"
+      label: new Date(new Date(item.label).getTime() + 9 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(5, 10), // "2024-03-21T13:00:00.000Z" -> "03-21"
     }));
   } catch (error) {
     console.log(error);

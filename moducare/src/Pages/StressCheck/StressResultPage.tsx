@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Dimensions, Image, SafeAreaView} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import ConfirmMark from '../../Components/Common/confirmMark';
 import {colors} from '../../constants/colors';
@@ -8,23 +8,34 @@ import CustomButton from '../../Components/Common/CustomButton';
 import CustomText from '../../Components/Common/CustomText';
 import {LineChart} from 'react-native-gifted-charts';
 import {getResult, ResultData} from '../../api/stress-check-api';
-
+import {getEncryptStorage} from '../../util';
 import {RootStackParamList} from '../../navigate/StackNavigate';
 const HEIGHT = Dimensions.get('window').height;
 const WIDTH = Dimensions.get('window').width;
-export default function StressResultPage() {
+
+export default function StressResultPage({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, 'StressResultPage'>;
+}) {
+  const [userName, setUserName] = useState('');
   const [isDone, setIsDone] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const stressScore = navigation.getState().routes[2].params?.stressScore || 0;
+  const {stressScore} = route.params;
   const [resultData, setResultData] = useState<ResultData[]>([]);
 
   useEffect(() => {
+    const getUserName = async () => {
+      const userInfo = await getEncryptStorage('info');
+      setUserName(userInfo.name);
+    };
     const fetchResultData = async () => {
       const result = await getResult();
       setResultData(result);
     };
+    getUserName();
     fetchResultData();
   }, []);
 
@@ -71,7 +82,7 @@ export default function StressResultPage() {
           </View>
           <View style={style.ResultContent}>
             <CustomText
-              label={'오진영 님의 스트레스 자가 진단 점수는'}
+              label={`${userName} 님의 스트레스 자가 진단 점수는`}
               size={20}
             />
             <View style={style.ResultScore}>

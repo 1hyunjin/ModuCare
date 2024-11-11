@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -14,10 +14,24 @@ import CustomText from '../../Components/Common/CustomText';
 import SvgIconAtom from '../../Components/Common/SvgIconAtom';
 import {BarChart} from 'react-native-gifted-charts';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import {RootStackParamList} from '../../navigate/StackNavigate';
+import {RouteProp} from '@react-navigation/native';
+import {useReportDetailQuery} from '../../quires/useReportsQuery';
 
-const DiagnosisResult = ({navigation}) => {
+const DiagnosisResult = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, 'aiResult'>;
+}) => {
+  const {type, id, diagnosisResult} = route.params;
+  const {data: diagnosisData} = useReportDetailQuery(id ?? 0, {
+    enabled: type === 'report',
+  });
+  const resultData = type === 'diagnosis' ? diagnosisResult : diagnosisData;
+
   const careText: string = `첫째, 두피를 깨끗하게 유지하려면 적어도 주 2-3회 샴푸로 세척해줘야 해요. 둘째, 너무 뜨거운 물보다는 미지근한 물을 사용하는 게 좋아요. 셋째, 각질 제거를  위해 주 1회 스크럽이나 두피 마스크를 사용해보세요.\n
 또한, 두피도 보습이 필요하니까 두피 전용 오일이나 세럼을 사용해 보습해주는 게 좋고요. 건강한 모발을 위해 균형 잡힌 식사를 하고, 스트레스는 운동이나 명상으로 관리해보세요. 자외선 차단도 잊지 말고, 마지막으로 두피 마사지를 통해 혈액순환을 촉진해주면 도움이 됩니다.`;
+
   const HEIGHT = Dimensions.get('window').height;
   const WIDTH = Dimensions.get('window').width;
   const chartData = [{value: 100}, {value: 50}];
@@ -32,13 +46,75 @@ const DiagnosisResult = ({navigation}) => {
     color: '#888',
   };
   const data = [
-    {value: 10, label: '탈모', labelTextStyle: labelTextStyle},
-    {value: 10, label: '비듬', labelTextStyle: labelTextStyle},
-    {value: 10, label: '염증', labelTextStyle: labelTextStyle},
-    {value: 10, label: '홍반', labelTextStyle: labelTextStyle},
-    {value: 10, label: '피지', labelTextStyle: labelTextStyle},
-    {value: 30, label: '각질', labelTextStyle: labelTextStyle},
+    {
+      value: resultData.result[0],
+      label: '탈모',
+      labelTextStyle: labelTextStyle,
+    },
+    {
+      value: resultData.result[1],
+      label: '비듬',
+      labelTextStyle: labelTextStyle,
+    },
+    {
+      value: resultData.result[2],
+      label: '염증',
+      labelTextStyle: labelTextStyle,
+    },
+    {
+      value: resultData.result[3],
+      label: '홍반',
+      labelTextStyle: labelTextStyle,
+    },
+    {
+      value: resultData.result[4],
+      label: '피지',
+      labelTextStyle: labelTextStyle,
+    },
+    {
+      value: resultData.result[5],
+      label: '각질',
+      labelTextStyle: labelTextStyle,
+    },
   ];
+
+  const headType = (() => {
+    switch (resultData.headType) {
+      case 0:
+        return '정상';
+      case 1:
+        return '건성 두피';
+      case 2:
+        return '지성 두피';
+      case 3:
+        return '민감성 두피';
+      case 4:
+        return '지루성 두피';
+      case 5:
+        return '염증성 두피';
+      case 6:
+        return '비듬성 두피';
+      case 7:
+        return '탈모';
+      default:
+        return '데이터 이상!';
+    }
+  })();
+
+  const comparisonText = (() => {
+    switch (resultData.headType) {
+      case 0:
+        return '두피가 나빠지고 있어요!';
+      case 1:
+        return '두피가 좋아졌어요!';
+      case 2:
+        return '두피 상태를 유지 중이에요!';
+      case 3:
+        return '두피를 잘 가꾸어 보도록 해요!';
+      default:
+        return '데이터 이상!';
+    }
+  })();
 
   // pdf
   const [pdfPath, setPdfPath] = useState('');
@@ -84,10 +160,7 @@ const DiagnosisResult = ({navigation}) => {
         <View style={styles.photoArea}>
           <View style={styles.photoDetailArea}>
             <CustomText label="제공된 두피 사진" size={20} />
-            <Image
-              style={styles.photo}
-              source={require('../../assets/test.png')}
-            />
+            <Image style={styles.photo} source={{uri: resultData.img}} />
           </View>
           <View style={styles.photoDetailArea}>
             <CustomText label="건강한 두피 사진" size={20} />
@@ -100,7 +173,7 @@ const DiagnosisResult = ({navigation}) => {
         <View style={{alignItems: 'center', marginBottom: 20}}>
           <Text style={styles.checkText}>
             AI 두피 진단 결과
-            <Text style={styles.checkResult}> 정상</Text> 입니다.
+            <Text style={styles.checkResult}> {headType}</Text> 입니다.
           </Text>
         </View>
         <CustomText label={'두피 상세 분석'} size={16} />
@@ -130,16 +203,21 @@ const DiagnosisResult = ({navigation}) => {
         <View style={styles.checkArea}>
           <View style={{width: '100%'}}>
             <CustomText label="MODU가 관찰한 두피 결과" size={20} />
-            <Text style={styles.checkText}>
+            <Text
+              style={styles.checkText}
+              // 이거 맨 처음 나오는 데이터에 따라 넣을지 말지 고민해야될듯
+            >
               최근 검사에 비해
-              <Text style={styles.checkResult}> 두피가 좋아졌어요!</Text>
+              <Text style={styles.checkResult}> {comparisonText}</Text>
             </Text>
           </View>
           <SvgIconAtom name="Good" />
         </View>
         <View style={styles.careArea}>
           <CustomText label="MODU가 추천하는 관리비결" size={20} />
-          <Text style={styles.careText}>{careText}</Text>
+          <Text style={styles.careText}>
+            {resultData.manageComment || careText}
+          </Text>
         </View>
         <View style={styles.BtnArea}>
           <CustomButtom

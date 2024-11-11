@@ -15,6 +15,7 @@ const OkPage = ({route}) => {
   console.log('도착', code);
 
   useEffect(() => {
+    console.log('카카오 요청', code);
     requestkakao(code);
   }, [code]);
 

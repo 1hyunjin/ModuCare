@@ -5,16 +5,19 @@ import CustomText from '../Components/Common/CustomText';
 import CustomButton from '../Components/Common/CustomButton';
 import {colors} from '../constants/colors';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import SmallList from '../Components/Challenge/SmallList';
 import WeatherInfo from '../Components/Weather/WeatherInfo';
 import MainCarousel from '../Components/Carousel/MainCarousel';
 import {getMyChallengeList, getMyListType} from '../api/challenge-api';
+import {RootStackParamList} from '../navigate/StackNavigate';
 import {setEncryptStorage} from '../util';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 export default function MainPage() {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [myList, setMyList] = React.useState<getMyListType[] | []>([]);
 
   const handleMoveFeedPage = (data: getMyListType) => {
@@ -32,7 +35,6 @@ export default function MainPage() {
   };
   useFocusEffect(
     React.useCallback(() => {
-      console.log('qq');
       getListCompo();
     }, []),
   );
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   challengeBox: {
-    height: WINDOW_HEIGHT * 0.17,
+    height: WINDOW_HEIGHT * 0.2,
     gap: 10,
     margin: 10,
   },

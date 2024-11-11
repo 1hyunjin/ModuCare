@@ -18,22 +18,12 @@ import {
   launchImageLibrary,
   ImageLibraryOptions,
 } from 'react-native-image-picker';
-import AWS from 'aws-sdk';
-import RNFS from 'react-native-fs';
-import {Buffer} from 'buffer';
-import Config from 'react-native-config';
 import {
   useLineDiaryQuery,
   usePostHairImgMutation,
   useTopDiaryQuery,
 } from '../../quires/useReportsQuery';
-
-// AWS S3 설정
-const s3 = new AWS.S3({
-  accessKeyId: Config.AWS_ACCESS_KEY_ID,
-  secretAccessKey: Config.AWS_SECRET_ACCESS_KEY,
-  region: Config.AWS_REGION,
-});
+import PopupModal, {useAlert} from '../../Components/Common/PopupModal';
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -47,44 +37,12 @@ export default function DiaryPage() {
   const {data: lineDiaryData} = useLineDiaryQuery();
   const {data: topDiaryData} = useTopDiaryQuery();
   const {mutate: postHairImgMutation} = usePostHairImgMutation();
+  const {showAlert} = useAlert();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [isLine, setIsLine] = useState(false);
   const [imgType, setImgType] = useState<'line' | 'top'>();
   const [imgConfig, setImgConfig] = useState<any>(null);
-
-  const upLoadImgToS3 = async (img: any): Promise<string> => {
-    console.log('upLoadImgToS3', img);
-
-    return new Promise(async (resolve, reject) => {
-      if (!Config.AWS_BUCKET) {
-        throw new Error('AWS_BUCKET is not defined');
-      }
-
-      const fileData = await RNFS.readFile(img.assets[0].uri, 'base64');
-      const timeStamp = new Date().getTime();
-      const originalFileName = img.assets[0].fileName;
-      const fileName = `${timeStamp}-${originalFileName}`;
-
-      const params = {
-        Key: fileName,
-        Bucket: Config.AWS_BUCKET,
-        Body: Buffer.from(fileData, 'base64'),
-        ContentType: img?.assets?.[0].type,
-      };
-
-      // S3 버켓에 파일 업로드
-      s3.upload(params, (err: any, data: any) => {
-        if (err) {
-          console.log('업로드 실패', err);
-          reject(err);
-        } else {
-          console.log(`File uploaded successfully. ${data.Location}`);
-          resolve(data.Location);
-        }
-      });
-    });
-  };
 
   const openImageLibrary = async (type: 'line' | 'top') => {
     const images = await launchImageLibrary(options);
@@ -96,27 +54,31 @@ export default function DiaryPage() {
 
   const imageUpload = async () => {
     if (!imgConfig?.assets || !imgType) {
-      Alert.alert('사진을 선택해주세요');
+      showAlert('사진을 선택해주세요');
       return;
     }
-    Alert.alert('업로드');
 
     try {
-      // 1. S3 업로드하고 URL 받아오기
-      const uploadedUrl: string = await upLoadImgToS3(imgConfig);
+      // 1. formData 생성
+      const formData = new FormData();
+      formData.append('file', {
+        uri: imgConfig?.assets?.[0].uri,
+        type: imgConfig?.assets?.[0].type,
+        name: imgConfig?.assets?.[0].fileName,
+      });
 
       // 2. 업로드 된 이미지 정보 전송
-      await postHairImgMutation({uploadedUrl, imgType});
+      await postHairImgMutation({formData, imgType});
 
       // 3. 초기화
       setImgType(undefined);
       setImgConfig(null);
-
+      showAlert('사진이 업로드 되었습니다.');
       // 4. 모달 닫기
       setModalVisible(false);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
-      Alert.alert('이미지 업로드에 실패했습니다.');
+      showAlert('이미지 업로드에 실패했습니다.');
     }
   };
 
@@ -203,6 +165,9 @@ export default function DiaryPage() {
           </View>
         </View>
       </SlideModal>
+      <PopupModal visible={alertModal.visible} onClose={closeAlert}>
+        <CustomText label={alertModal.message} />
+      </PopupModal>
       <View style={styles.bottomSpace} />
     </SafeAreaView>
   );

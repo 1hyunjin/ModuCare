@@ -42,7 +42,7 @@ export default function MainCarousel() {
       img: latestProductData
         ? {uri: latestProductData.imgSrc}
         : require('../../assets/img/ProductIcon.png'),
-      buttonLabel: latestProductData ? '보러가기' : '최근 본 상품이 없어요!',
+      buttonLabel: latestProductData ? '보러가기' : '최근 본 상품이 없어요',
       buttonOnPress: () => {
         if (latestProductData) {
           Linking.openURL(latestProductData.link);
