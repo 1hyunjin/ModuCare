@@ -1,6 +1,5 @@
 import io
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 import httpx
 import torch
@@ -109,12 +108,10 @@ async def diagnose_scalp(request: ImageRequest):
         # 두피 이미지가 아닌 경우 400 상태 코드 반환
         return JSONResponse(status_code=400, content={"error": "두피 이미지가 아닙니다."})
 
-    # 병렬로 여러 모델 예측 진행
-    with ThreadPoolExecutor() as executor:
-        futures = {
-            model_name: executor.submit(predict_model, model, img) for model_name, model in models.items()
-        }
-        outputs = {model_name: future.result() for model_name, future in futures.items()}
+    # 순차 실행
+    outputs = {}
+    for model_name, model in models.items():
+        outputs[model_name] = predict_model(model, img)
 
     # 각 모델의 예측 결과 추출
     predictions = {model_name: output.argmax(dim=1, keepdim=True).item() for model_name, output in outputs.items()}
